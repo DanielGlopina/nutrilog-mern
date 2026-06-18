@@ -1,0 +1,31 @@
+{
+  "name": "nutrilog",
+  "version": "1.0.0",
+  "description": "A modern web-application for nutritional tracking",
+  "license": "ISC",
+  "author": "Daniiel Hlopina",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "server": "nodemon backend/server.js",
+    "client": "npm --prefix frontend run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "data:import": "node backend/seeder.js -i",
+    "data:destroy": "node backend/seeder.js -d"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "colors": "^1.4.0",
+    "express": "^5.2.1",
+    "express-validator": "^7.3.2",
+    "gravatar": "^1.8.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.7.1"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3",
+    "dotenv": "^17.4.2",
+    "nodemon": "^3.1.14"
+  }
+}
