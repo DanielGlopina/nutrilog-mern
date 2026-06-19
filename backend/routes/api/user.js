@@ -42,10 +42,19 @@ router.post('/', [
                 d: "mm",
             })
 
+            const nutritions = {
+                kcal: null,
+                proteins: null,
+                carbs: null,
+                fats: null,
+                fiber: null,
+            }
+
             user = new User({
                 name,
                 email,
                 avatar,
+                nutritions,
                 password,
             })
 
