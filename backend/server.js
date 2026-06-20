@@ -7,9 +7,9 @@ const port = process.env.PORT || 5000;
 import authRouter from './routes/api/auth.js'; 
 import userRouter from './routes/api/user.js';
 import mealRouter from './routes/api/meal.js';
+import nutritionRouter from './routes/api/nutrition.js';
 
 // import User from './models/User.js';
-import MealsList from './models/MealsList.js';
 // import bcrypt from 'bcryptjs';
 
 const app = express();
@@ -30,26 +30,6 @@ app.get('/', async(req, res) => {
 
     // await newUser.save();
 
-    const newMealsList = new MealsList({
-        user: "6a33ca25812f0d9c883e9a76",
-        meals: [
-            {
-                name: 'Dummy meal',
-                mealType: "breakfast",
-                weight: 300,
-                kcal: 67,
-                macros: {
-                    proteins: 20,
-                    carbs: 11,
-                },
-                date: Date.now()
-
-            }
-        ],
-    })
-
-    await newMealsList.save();
-
     res.send('API is running!');
 })
 
@@ -57,5 +37,6 @@ app.get('/', async(req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
 app.use("/api/meals", mealRouter);
+app.use("/api/nutritions", nutritionRouter);
 
 app.listen(port, () => console.log(`Server running on port ${port}`));

@@ -1,134 +1,132 @@
-import express from 'express';
+import express from "express";
 const router = express.Router();
-import auth from '../../middleware/auth.js'
-import {validationResult} from 'express-validator';
-import { mealValidator } from '../../validators/mealValidator.js';
+import auth from "../../middleware/auth.js";
+import { validationResult } from "express-validator";
+import { mealCreateValidator, mealUpdateValidator } from "../../validators/mealValidators.js";
+import { formatISO, parseISO } from "date-fns";
 
-import MealsList from '../../models/MealsList.js';
+import Meal from "../../models/Meal.js";
 
-// @route   GET api/meal/:date
+// @route   GET api/meals/:date
 // @desc    Get meals by date
 // @access  Private
-router.get('/:date', auth, async(req, res) => {
+router.get('/:date', auth, async (req, res) => {
     try {
-        const mealListDoc = await MealsList.findOne({ user: req.user.id, "meals.date": req.params.date }).select('meals -_id').populate('meals');
-        const meals = mealListDoc ? mealListDoc.meals : [];
+        const dateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+
+        if (!dateRegex.test(req.params.date)) {
+            return res.status(400).json({ msg: "Invalid data format" });
+        }
+
+        const targetDateObj = new Date(req.params.date);
+
+        const meals = await Meal.find({user: req.user.id, date: targetDateObj}).select("-_id, -user");
+
         res.json(meals);
     } catch (error) {
         console.error(error.message);
-        res.status(500).send('Server Error');
+        res.status(500).send("Server Error");
     }
 })
 
-// @route   POST api/meal/create
+
+// @route   POST api/meals/create
 // @desc    Create new meal
 // @access  Private
-router.post('/create',
-    mealValidator,
-    auth, async(req, res) => {
-        const errors = validationResult(req);
-        if(!errors.isEmpty()){
-            return res.status(400).json({errors: errors.array()});
-        }
+router.post("/create", mealCreateValidator, auth, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
-        try {
-            const mealsList = await MealsList.findOne({user: req.user.id});
+  try {
+    const { name, mealType,  weight, kcal, date} = req.body;
+    const { proteins, carbs, fats, fiber} = req.body.macros;
 
-            if(!mealsList){
-                const newMealsList = new MealsList({
-                    user: req.user.id,
-                    meals: [
+    const newMeal = new Meal({
+        user: req.user.id,
+        name,
+        mealType,
+        weight,
+        kcal,
+        macros: {
+            proteins: proteins || 0,
+            carbs: carbs || 0,
+            fats: fats || 0,
+            fiber: fiber || 0,
+        },
+        date: new Date(date),
+    });
 
-                    ],
-                })
+    const result = await newMeal.save();
 
-                await newMealsList.save();
-            }
+    res.json(result);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server Error");
+  }
+});
 
-            const {name, mealType, kcal, weight, proteins, carbs, fats, fiber, date} = req.body;
-
-            const newMeal = {};
-
-            if (name) newMeal.name = name;
-            if (mealType) newMeal.mealType = mealType;
-            if (weight !== undefined) newMeal.weight = weight;
-            if (kcal !== undefined) newMeal.kcal = kcal;
-            if (date) newMeal.date = date;
-
-            if (proteins !== undefined || carbs !== undefined || fats !== undefined || fiber !== undefined) {
-                newMeal.macros = {};
-                if (proteins !== undefined) newMeal.macros.proteins = proteins;
-                if (carbs !== undefined) newMeal.macros.carbs = carbs;
-                if (fats !== undefined) newMeal.macros.fats = fats;
-                if (fiber !== undefined) newMeal.macros.fiber = fiber;
-            }
-
-            const result = await MealsList.findOneAndUpdate(
-                { user: req.user.id }, 
-                { $push: { meals: newMeal } }, 
-                { new: true } 
-            );
-            res.json(result);
-
-
-        } catch (error) {
-            console.error(error.message);
-            res.status(500).send('Server Error');
-        }
-})
-
-
-// @route   PUT api/meal/update/:id/meal/:mealId
+// @route   PUT api/meals/update/:mealId
 // @desc    Update meal
 // @access  Private
-router.put('/update/:id/meal/:mealId', mealValidator,  auth, async(req, res) => {
-        const errors = validationResult(req);
-        if(!errors.isEmpty()){
-            return res.status(400).json({errors: errors.array()});
+router.put("/update/:mealId", mealUpdateValidator, auth, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+   try {
+        const { name, mealType,  weight, kcal, date} = req.body;
+
+        const updateMeal = {};
+        if(name) updateMeal.name = name;
+        if(mealType) updateMeal.mealType = mealType;
+        if(weight) updateMeal.weight = weight;
+        if(kcal) updateMeal.kcal = kcal;
+        if(req.body.macros){
+            const { proteins, carbs, fats, fiber} = req.body.macros;
+            updateMeal.macros = {};
+            if(proteins) updateMeal.macros.proteins = proteins;
+            if(carbs) updateMeal.macros.carbs = carbs;
+            if(fats) updateMeal.macros.fats = fats;
+            if(fiber) updateMeal.macros.fiber = fiber;
+            if(date) updateMeal.date = date;
         }
-    try {
-        const {name, mealType, kcal, weight, proteins, carbs, fats, fiber, date} = req.body;
 
-        const updateFields = {};
+        const meal = await Meal.findById(req.params.mealId);
 
-        if (name) updateFields["meals.$.name"] = name;
-        if (mealType) updateFields["meals.$.mealType"] = mealType;
-        if (weight !== undefined) updateFields["meals.$.weight"] = weight;
-        if (kcal !== undefined) updateFields["meals.$.kcal"] = kcal;
-        if (proteins !== undefined) updateFields["meals.$.macros.proteins"] = proteins;
-        if (carbs !== undefined) updateFields["meals.$.macros.carbs"] = carbs;
-        if (fats !== undefined) updateFields["meals.$.macros.fats"] = fats;
-        if (fiber !== undefined) updateFields["meals.$.macros.fiber"] = fiber;
-        if (date) updateFields["meals.$.date"] = date;
+        if(!meal){
+            return res.status(404).json({msg: 'Meal not found'});
+        }
 
-        const updatedMeal = await MealsList.findOneAndUpdate(
-            { 
-                _id: req.params.id, 
-                "meals._id": req.params.mealId
-            },
-            {
-                $set: updateFields 
-            },
-            { new: true } 
-        );
+        const result = await Meal.findOneAndUpdate({_id: req.params.mealId, user: req.user.id}, updateMeal, {new: true})
 
-        res.json(updatedMeal);
-    } catch (error) {
+        res.json(result)
+   } catch (error) {
         console.error(error.message);
-        res.status(500).send('Server Error');
-    }
+        res.status(500).send("Server Error");
+   }
 })
 
-// @route   DELETE api/meal/delete/:id/meal/:mealId
-// @desc    Delete meal
+// @route   DELETE api/meals/delete/:mealId
+// @desc    Delete a meal
 // @access  Private
-router.delete('/delete/:id/meal/:mealId', auth, (req, res) => {
-    try {
-        
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).send('Server Error');
+router.delete("/delete/:mealId", auth, async (req, res) => {
+  try {
+    const meal = await Meal.findById(req.params.mealId);
+
+    if(!meal){
+        return res.status(404).json({msg: 'Meal not found'});
     }
-})
+
+    const result = await Meal.findOneAndDelete({_id: req.params.mealId, user: req.user.id})
+
+    res.json(result);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server Error");
+  }
+});
 
 export default router;
