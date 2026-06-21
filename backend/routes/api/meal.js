@@ -20,7 +20,7 @@ router.get('/:date', auth, async (req, res) => {
 
         const targetDateObj = new Date(req.params.date);
 
-        const meals = await Meal.find({user: req.user.id, date: targetDateObj}).select("-_id, -user");
+        const meals = await Meal.find({user: req.user.id, date: targetDateObj}).select("-_id");
 
         res.json(meals);
     } catch (error) {
