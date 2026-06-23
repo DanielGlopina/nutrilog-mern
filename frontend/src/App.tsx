@@ -5,6 +5,8 @@ import NewMealPage from './pages/NewMealPage';
 import EditMealPage from './pages/EditMealPage';
 import DashboardPage from './pages/DashboardPage';
 import CalculateNutritionsPage from './pages/CalculateNutritionsPage';
+import AuthPage from './pages/AuthPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
   
@@ -19,7 +21,12 @@ function App() {
         {path: '/meals/edit', element: <EditMealPage/>},
         {path: '/dashboard', element: <DashboardPage/>},
         {path: '/dashboard/nutritions', element: <CalculateNutritionsPage/>},
+        {path: '/auth', element: <AuthPage/>}
       ]
+    },
+    {
+      path: '*',
+      element: <NotFoundPage/>
     }
   ])
 

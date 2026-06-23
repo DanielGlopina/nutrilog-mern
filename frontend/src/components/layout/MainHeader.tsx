@@ -1,6 +1,6 @@
 import { Link } from "react-router"
 import NavbarMenuSheet from "./NavbarMenuSheet"
-import UserDropdown from './UserDropdown';
+// import UserDropdown from './UserDropdown';
 import { UtensilsCrossed } from "lucide-react"
 
 const MainHeader = () => {
@@ -13,8 +13,15 @@ const MainHeader = () => {
             Nutrilog
         </Link>
 
-        <div className=" flex flex-end gap-4 ml-auto">
-           <UserDropdown/>
+        <div className=" flex flex-end gap-7 ml-auto">
+           {/* <UserDropdown/>  USER IS LOGGED IN*/} 
+          <Link to={'/auth/?mode=login'}>
+            Login
+          </Link>
+
+          <Link to={'/auth/?mode=signup'}>
+            Sign Up
+          </Link>
         </div>
     </header>
   )
