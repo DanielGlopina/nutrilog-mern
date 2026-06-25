@@ -3,19 +3,29 @@ import { calculateNutrientsTotals } from "@/lib/aggregations";
 import DashboardCard from "./DasboardCard";
 import { dummyMeals } from "@/data/dummy-meals";
 import { dummyNutritions } from "@/data/dummy-nutritions";
+// import { useQuery } from "@tanstack/react-query";
+import api from "@/api/api";
 
 function DashboardCardWrapper({ formatedDate }: { formatedDate: string }) {
-    const navigate = useNavigate();
+   const navigate = useNavigate();
 
-    // QUERY -- GET nutritions 
-   const nutritions = dummyNutritions;//replace
+   const nutritions = dummyNutritions;
 
    if (!nutritions) {
       navigate('/dashboard/nutritions');
    }
 
-    // QUERY -- GET meals by date    
-   const mealsByDate = dummyMeals; //replace
+   const getMealsByDate = async() => {
+      return api.get(`/meals/${formatedDate}`).then((result) => {
+         console.log(result.data);
+      })
+   }
+
+   getMealsByDate();
+   
+
+   // useQuery({queryKey: ['todos'], queryFn: ...})
+   const mealsByDate = dummyMeals;
    const dailySummary = calculateNutrientsTotals(mealsByDate);
 
    return <DashboardCard dailySummary={dailySummary} nutritions={nutritions} formatedDate={formatedDate} />

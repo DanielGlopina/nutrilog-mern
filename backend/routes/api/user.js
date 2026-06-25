@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
 import {check, validationResult} from 'express-validator';
+import { signupValidator } from '../../validators/signupValidator.js';
 
 import User from '../../models/User.js';
 
@@ -13,14 +14,7 @@ import User from '../../models/User.js';
 // @route   POST api/users
 // @desc    Register user
 // @access  Public
-router.post('/', [
-    check("name", 'Name is required').not().isEmpty(),
-    check("email", "Please enter a valid email").isEmail(),
-    check(
-        "password",
-        "Please enter a password with 6 characters or more"
-    ).isLength({min: 6}),
-],
+router.post('/', signupValidator,
     async(req, res ) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()){
@@ -42,19 +36,10 @@ router.post('/', [
                 d: "mm",
             })
 
-            const nutritions = {
-                kcal: null,
-                proteins: null,
-                carbs: null,
-                fats: null,
-                fiber: null,
-            }
-
             user = new User({
                 name,
                 email,
                 avatar,
-                nutritions,
                 password,
             })
 

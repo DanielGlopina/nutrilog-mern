@@ -9,7 +9,9 @@ import AuthPage from './pages/AuthPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
+
   
+
   const router = createBrowserRouter([
     {
       path: '/',
