@@ -17,6 +17,9 @@ export const signupFormSchema = z.object({
     .min(8, 'Password should include at least 8 symbols')
     .regex(passwordRegex,'Password should include at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 spec. symbol (_ @ # $ % !)'),
     confirmPassword: z
-    .string('Complete this field')
+    .string('Complete this field'),
 
-})
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+});

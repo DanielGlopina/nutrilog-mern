@@ -10,9 +10,7 @@
     "start": "node backend/server.js",
     "server": "nodemon backend/server.js",
     "client": "npm --prefix frontend run dev",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "data:import": "node backend/seeder.js -i",
-    "data:destroy": "node backend/seeder.js -d"
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

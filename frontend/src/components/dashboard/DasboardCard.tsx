@@ -1,30 +1,19 @@
+import { memo } from "react";
 import { Link } from "react-router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import CircularWithValueLabel from "@/components/ui/circular-progress";
 import { Button } from "@/components/ui/button";
 import { ClipboardList } from "lucide-react";
+import type { Nutritions } from "@/types/Nutritions.type";
 
-type DailySummary = {
-   kcal: number;
-   macros: {
-    proteins: number;
-    carbs: number;
-    fats: number;
-    fiber: number;
-   }
-}
 
-type UserNutritions = { user: string } & DailySummary;
 
 function DashboardCard({ dailySummary, nutritions, formatedDate }: {
-   dailySummary: DailySummary,
-   nutritions: UserNutritions,
+   dailySummary: Nutritions,
+   nutritions: Nutritions,
    formatedDate: string
 }) {
-    const {proteins, carbs, fats, fiber} = dailySummary.macros;
-
-
-
+   const {proteins, carbs, fats, fiber} = dailySummary.macros;
    const kcalConsumed = Math.round((dailySummary.kcal / nutritions.kcal) * 100);
    const proteinsConsumed = Math.round((proteins / nutritions.macros.proteins) * 100);
    const carbsConsumed = Math.round((carbs / nutritions.macros.carbs) * 100);
@@ -41,7 +30,6 @@ function DashboardCard({ dailySummary, nutritions, formatedDate }: {
         ];
    return cardsData.map((card, index) => {
       return (
-         // Используем уникальное и постоянное имя карточки в качестве ключа
          <Card key={card.name} className="w-[170px] border text-center">
             <CardHeader>
                <CardTitle className='text-black capitalize'>{card.name}</CardTitle>
@@ -82,4 +70,4 @@ function DashboardCard({ dailySummary, nutritions, formatedDate }: {
    </Card>;
 }
 
-export default DashboardCard;
+export default memo(DashboardCard);

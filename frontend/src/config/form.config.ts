@@ -10,5 +10,10 @@ export const formConfig = {
       loss: 'Weight Loss',
       gain: 'Gain Weight',
       maintain: 'Maintain Weight'
+   },
+   temp: {
+      mild: 'Mild',
+      moderate: 'Moderate',
+      agressive: 'Agressive'
    }
 };

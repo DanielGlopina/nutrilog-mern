@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, memo } from "react";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,6 @@ function MealsTable({ meals, name }: {
    meals: MealItem[],
    name: string,
 }) {
-
    const totals = useMemo(() => {
       return calculateNutrientsTotals(meals)
    }, [meals]
@@ -23,7 +22,7 @@ function MealsTable({ meals, name }: {
    const getTableCells = () => {
       return (
          meals.map((meal) => {
-            const { _id, name, weight, kcal } = meal;
+            const { _id, name, weight, kcal, date } = meal;
             const { proteins, carbs, fats, fiber} = meal.macros;
             return (
                <TableRow key={_id}>
@@ -40,7 +39,7 @@ function MealsTable({ meals, name }: {
                            <PencilLine />
                         </Link>
                      </Button>
-                     <DeleteMealButton mealId={_id} />
+                     <DeleteMealButton mealId={_id} mealDate={date} />
                   </TableCell>
                </TableRow>
             )
@@ -105,4 +104,4 @@ function MealsTable({ meals, name }: {
    </Card >
 }
 
-export default MealsTable;
+export default memo(MealsTable);

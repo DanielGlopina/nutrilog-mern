@@ -1,48 +1,60 @@
-import axios from "axios";
-import { useAuthStore } from "@/store/authStore";
+import axios from 'axios';
+import { useAuthStore } from '@/store/useAuthStore';
+import { toast } from 'sonner';
 
 const api = axios.create({
-    baseURL: '/api',
-    timeout: 10000,
-});
+    baseURL: '/api'
+})
 
-api.interceptors.request.use(
-    (config) => {
-        const token = useAuthStore.getState().token;
 
-        if (token) {
-            // Добавьте 'Bearer ', если этого требует ваш бэкенд
-            config.headers.Authorization = `Bearer ${token}`; 
-            // Если бэкенд ждет просто токен, верните как было: = token;
+// If 401st error is received either on /auth/login or  /auth/register, then credentials are invalid
+const AUTH_ENDPOINTS = ['/auth/login', '/auth/register'];
+
+// Request interceptor 
+api.interceptors.request.use((config) => {
+    try {
+        const isAuthEndpoint = AUTH_ENDPOINTS.some((endpoint) => config.url?.includes(endpoint));
+
+        if(!isAuthEndpoint){
+            const storageData = localStorage.getItem('auth-storage');
+            if(storageData){
+                const parsed = JSON.parse(storageData);
+                const token = parsed?.state?.token;
+
+                if(token){
+                    config.headers['x-auth-token'] = token;
+                }
+            }
+
         }
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
+    } catch (e) {
+        console.error('Failed to parse auth-storage from localStorage:', e);
+    }
+    return config;
+},
+    (error) => {
+        return Promise.reject(error);
+    }
+)
 
-// Флаг, чтобы не вызывать logout несколько раз при параллельных 401 ошибках
-let isLoggingOut = false;
-
+// Response interceptor — handling 401st error & logging out
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response && error.response.status === 401) {
-            console.warn('Token has expired');
+        const status = error.response?.status;
+        const url = error.config?.url ?? '';
 
-            if (!isLoggingOut) {
-                isLoggingOut = true;
-                useAuthStore.getState().logout();
-                
-                // Опционально: можно добавить редирект на страницу логина
-                // window.location.href = '/login'; 
-                
-                // Сбрасываем флаг через небольшую задержку (или после редиректа)
-                setTimeout(() => { isLoggingOut = false; }, 1000);
-            }
+        const isAuthEndpoint = AUTH_ENDPOINTS.some((endpoint) => url.includes(endpoint));
+
+        if (status === 401 && !isAuthEndpoint) {
+            toast.error('Error!', {
+                description: 'Token is expired. Logging out...'
+            })
+            useAuthStore.getState().setLogout();
         }
 
         return Promise.reject(error);
     }
-);
+)
 
-export default api;
+export { api };

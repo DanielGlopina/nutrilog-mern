@@ -1,35 +1,46 @@
+import { useEffect, memo, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { calculateNutrientsTotals } from "@/lib/aggregations";
 import DashboardCard from "./DasboardCard";
-import { dummyMeals } from "@/data/dummy-meals";
-import { dummyNutritions } from "@/data/dummy-nutritions";
-// import { useQuery } from "@tanstack/react-query";
-import api from "@/api/api";
-
+import DashboardCardSkeleton from "./DashboardCardSkeleton";
+import useGetMealsByDate from "@/hooks/useGetMealsByDate";
+import useGetNutritions from "@/hooks/useGetNutritions";
 function DashboardCardWrapper({ formatedDate }: { formatedDate: string }) {
+   const { meals, isLoading, isFetching } = useGetMealsByDate(formatedDate);
+   const {nutritions, isLoading: isPending} = useGetNutritions();
    const navigate = useNavigate();
 
-   const nutritions = dummyNutritions;
+   const dailySummary = useMemo(() => {
+      return calculateNutrientsTotals(meals ?? []);
+   }, [meals]);
 
-   if (!nutritions) {
-      navigate('/dashboard/nutritions');
+
+   useEffect(() => {
+      if (!isPending) {
+         if (!nutritions) {
+            navigate('/dashboard/nutritions');
+         }
+      }
+   }, [nutritions, isPending, navigate]);
+
+
+   if (isLoading || isPending) {
+      return <DashboardCardSkeleton />;
    }
 
-   const getMealsByDate = async() => {
-      return api.get(`/meals/${formatedDate}`).then((result) => {
-         console.log(result.data);
-      })
+  if (!isPending && (!nutritions)) {
+      return null; 
    }
 
-   getMealsByDate();
-   
+  
 
-   // useQuery({queryKey: ['todos'], queryFn: ...})
-   const mealsByDate = dummyMeals;
-   const dailySummary = calculateNutrientsTotals(mealsByDate);
 
-   return <DashboardCard dailySummary={dailySummary} nutritions={nutritions} formatedDate={formatedDate} />
-
+   return <>
+      {isFetching && (
+         <div className="text-center text-zinc-500 text-sm py-2">Updating...</div>
+      )}
+      <DashboardCard dailySummary={dailySummary} nutritions={nutritions} formatedDate={formatedDate} />
+   </>;
 }
 
-export default DashboardCardWrapper;
+export default memo(DashboardCardWrapper);

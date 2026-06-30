@@ -12,14 +12,17 @@ import {
   DropdownMenuLabel
 } from "@/components/ui/dropdown-menu"
 import { Link } from "react-router"
+import { useAuthStore } from "@/store/useAuthStore"
 
 export default function UserDropdown() {
+  const {user, setLogout} = useAuthStore();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="flex gap-3 text-zinc-200 cursor-pointer">
-            <img src="//www.gravatar.com/avatar/160d34368ccada79187317c203d57be2?s=200&r=pg&d=mm" alt="User Avatar" className="rounded-full h-9"/>
-            <span className="mt-1 hidden sm:block">glopinadaniel@gmail.com</span>
+            <img src={user?.avatar} alt="User Avatar" className="rounded-full h-9"/>
+            <span className="mt-1 hidden sm:block">{user?.email}</span>
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
@@ -32,9 +35,9 @@ export default function UserDropdown() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive">
-          <LogOutIcon />
-          Log out
+        <DropdownMenuItem variant="destructive" onClick={setLogout}>
+              <LogOutIcon />
+              Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

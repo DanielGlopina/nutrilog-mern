@@ -2,7 +2,7 @@ import z from "zod";
 import { nutritionsFormSchema } from "@/validation/nutritionsForm.schema";
 
 export function calculateUserNutririons(data: z.infer<typeof nutritionsFormSchema>) {
-   const BMR_base = 10 * data.weight + 6.25 * data.heigth - 5 * data.age;
+   const BMR_base = 10 * data.weight + 6.25 * data.height - 5 * data.age;
    let resultKcal = data.gender === 'male' ? BMR_base + 5 : BMR_base - 161;
    const proteins = Math.round(data.weight * 1.6);
    const fats = data.weight;
@@ -22,15 +22,29 @@ export function calculateUserNutririons(data: z.infer<typeof nutritionsFormSchem
          break;
    }
 
+   if(data.temp){
+      switch(data.temp){
+         case 'mild':
+            resultKcal *= data.goal === 'gain' ? 1.15 : 0.85; break;
+         case 'moderate':
+            resultKcal *= data.goal === 'gain' ? 1.20 : 0.80; break;
+         case 'agressive':
+            resultKcal *= data.goal === 'gain' ? 1.25 : 0.75; break;
+      }
+   }
+
    resultKcal = Math.round(resultKcal);
+
    const carbs = Math.round((resultKcal - (proteins * 4 + fats * 9)) / 4);
    const fiber = Math.round((resultKcal / 1000) * 14)
 
    return {
       kcal: resultKcal,
-      proteins,
-      carbs,
-      fats,
-      fiber
+      macros: {
+         proteins,
+         carbs,
+         fats,
+         fiber
+      }
    }
 }

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const mealSchema = mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "user",
+        ref: "User",
         required: true,
     },
     name: {
@@ -41,7 +41,11 @@ const mealSchema = mongoose.Schema({
         required: true
     }
         
+}, {
+    timestamps: true
 })
+
+mealSchema.index({user: 1, date: 1});
 
 const Meal = mongoose.model('Meal', mealSchema);
 export default Meal;

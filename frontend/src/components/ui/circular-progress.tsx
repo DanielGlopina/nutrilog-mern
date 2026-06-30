@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import CircularProgress, {
    type CircularProgressProps,
@@ -10,6 +8,10 @@ import Box from '@mui/material/Box';
 export function CircularProgressWithLabel(
    props: CircularProgressProps & { value: number },
 ) {
+   
+   const value = props.value < 0 ? 0 : props.value;
+
+
    return (
       <Box
          sx={{
@@ -23,15 +25,15 @@ export function CircularProgressWithLabel(
             aria-label="Percent of macronutrient consumed"
             size={100}
             color={
-               props.value > 110
+               value > 110
                   ? 'error'
-                  : props.value > 100
+                  : value > 100
                     ? 'warning'
                     : 'success'
             }
             thickness={4}
             {...props}
-            value={Math.min(props.value, 100)}
+            value={Math.min(value, 100)}
             sx={{
                '& .MuiCircularProgress-circle': {
                   transition: 'stroke-dashoffset 0.3s ease-out',

@@ -2,14 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import CalculateNutritionsForm from '@/components/dashboard/CalculateNutritionsForm';
 import { Breadcrumbs } from "@/components/ui/breadcrumb";
 
-async function CalculateNutritionsPage() {
-    //    const { userId } = await auth();
-
-    //    if (!userId) {
-    //       redirect('/'); AUTH QUERY
-    //    }
-
-
+function CalculateNutritionsPage() {
+   
    return <div>
       <div className="flex justify-center mt-5">
          <Breadcrumbs items={

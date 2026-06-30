@@ -19,5 +19,3 @@ export const mealItemSchema = z.object({
       .min(subYears(new Date(), 20), "Date is too far in the past")
       .max(addDays(new Date(), 30), "You cannot pick the date further than 1 month")
 });
-
-// TO VALIDATE DATES IN THIS WAY ON BACKEND

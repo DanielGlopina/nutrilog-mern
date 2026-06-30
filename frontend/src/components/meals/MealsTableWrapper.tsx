@@ -1,24 +1,38 @@
+import { memo, useMemo } from 'react';
 import MealsTable from './MealsTable';
-import {dummyMeals} from '../../data/dummy-meals';
-
+import MealsTablesSkeleton from './MealsTableSkeleton';
+import useGetMealsByDate from '@/hooks/useGetMealsByDate';
+import type { MealItem } from '@/types/MealItem.type';
 
 function MealTablesWrapper({ date }: { date: string }) {
-   const meals = dummyMeals;
-   console.log(date);
+   const { meals, isLoading, isFetching } = useGetMealsByDate(date);
+   
+   const groupedMeals = useMemo(() => {
+      const initialGroups: Record<'breakfast' | 'lunch' | 'dinner' | 'snack', MealItem[]> = {breakfast: [], lunch: [], dinner: [], snack: []};
 
-   const breakfast = meals.filter((meal) => meal.mealType === 'breakfast');
-   const lunch = meals.filter((meal) => meal.mealType === 'lunch');
-   const dinner = meals.filter((meal) => meal.mealType === 'dinner');
-   const snack = meals.filter((meal) => meal.mealType === 'snack');
+      if(!meals) return initialGroups;
 
+      return meals.reduce((acc, meal) => {
+         if(acc[meal.mealType]){
+            acc[meal.mealType].push(meal)
+         }
+         return acc;
+      }, initialGroups)
+   }, [meals]);
+
+   if(isLoading){
+      return <MealsTablesSkeleton/>
+   }
 
    return <>
-      <MealsTable meals={breakfast} name={"breakfast"} />
-      <MealsTable meals={lunch} name={"lunch"} />
-      <MealsTable meals={dinner} name={"dinner"} />
-      <MealsTable meals={snack} name={"snack"} />
-   </>
-
+      {isFetching && (
+         <div className="text-center text-zinc-500 text-sm py-2">Updating...</div>
+      )}
+      <MealsTable meals={groupedMeals.breakfast} name={"breakfast"} />
+      <MealsTable meals={groupedMeals.lunch} name={"lunch"} />
+      <MealsTable meals={groupedMeals.dinner} name={"dinner"} />
+      <MealsTable meals={groupedMeals.snack} name={"snack"} />
+   </>;
 }
 
-export default MealTablesWrapper;
+export default memo(MealTablesWrapper);

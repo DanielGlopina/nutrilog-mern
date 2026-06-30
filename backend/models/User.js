@@ -7,28 +7,12 @@ const userSchema = mongoose.Schema({
  },
  email: {
     type: String,
-    required: true
+    required: true,
+    unique: true
  },
  avatar: {
    type: String,
    required: true,
- },
- nutritions: {
-      kcal: {
-         type: Number,
-      },
-      proteins: {
-         type: Number,
-      },
-      carbs: {
-         type: Number,
-      },
-      fats: {
-         type: Number,
-      },
-      fiber: {
-         type: Number,
-      }
  },
  password: {
     type: String,
