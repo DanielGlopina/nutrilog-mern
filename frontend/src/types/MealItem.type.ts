@@ -1,16 +1,21 @@
-import type { MealType } from "./MealType.type"
+import type { MealType } from "./MealType.type";
 
 export type MealItem = {
-   _id: string,
-   mealType: MealType,
-   name: string,
-   weight: number,
-   kcal: number,
-   macros: {
-      proteins: number,
-      carbs: number,
-      fats: number,
-      fiber: number,
-   },
-   date: Date
-}
+  _id: string;
+  mealType: MealType;
+  name: string;
+  weight: number;
+  kcal: number;
+  macros: {
+    proteins: number;
+    carbs: number;
+    fats: number;
+    fiber: number;
+  };
+  date: Date;
+};
+
+export type MealItemTotals = Omit<
+  MealItem,
+  "_id" | "mealType" | "name" | "weight" | "date"
+>;

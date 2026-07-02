@@ -32,9 +32,10 @@ type Props = {
   defaultMealType?: string;
   formType: "create" | "edit";
   mealData?: MealItem | null;
+  isQuerrying: boolean;
 };
 
-function MealForm({ defaultMealType, formType, mealData }: Props) {
+function MealForm({ defaultMealType, formType, mealData, isQuerrying }: Props) {
   const queryClient = useQueryClient();
   const [isPending, startTransition] = useTransition();
   const { isChecking } = useAuthStore();
@@ -179,7 +180,7 @@ function MealForm({ defaultMealType, formType, mealData }: Props) {
       <Button
         type="submit"
         className="flex items-center justify-start w-50 h-10 mt-10"
-        disabled={isPending || isChecking}
+        disabled={isPending || isChecking || isQuerrying}
       >
         {formType === "create" ? (
           <>
@@ -192,7 +193,9 @@ function MealForm({ defaultMealType, formType, mealData }: Props) {
             Edit Meal
           </>
         )}
-        {(isPending || isChecking) && <Loader className="animate-spin" />}
+        {(isPending || isChecking || isQuerrying) && (
+          <Loader className="animate-spin" />
+        )}
       </Button>
     </form>
   );

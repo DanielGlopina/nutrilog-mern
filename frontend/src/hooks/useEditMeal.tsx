@@ -8,50 +8,57 @@ import { mealFormSchema } from "@/validation/mealForm.schema";
 import { queryErrorHandler } from "@/lib/queryErrorHandler";
 
 const useEditMeal = () => {
-    const queryClient = useQueryClient();
-    const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
-    const updateMeal = async({mealId, data} : {
-        mealId: string | undefined,
-        data: z.infer<typeof mealFormSchema>
-    }) => {
-        const meal = {
-            mealType: data.mealType, 
-            name: data.name,
-            weight: data.weight,
-            kcal: data.kcal,
-            macros: {
-                proteins: data.proteins ?? 0,
-                carbs: data.carbs ?? 0,
-                fats: data.fats ?? 0,
-                fiber: data.fiber ?? 0,
-            },
-            date: format(data.date, 'yyyy-MM-dd'),
-        }
-        
-        const result = await api.put(`/meals/update/${mealId}`, meal);
-        return result.data;
-    }
+  const updateMeal = async ({
+    mealId,
+    data,
+  }: {
+    mealId: string | undefined;
+    data: z.infer<typeof mealFormSchema>;
+  }) => {
+    const meal = {
+      mealType: data.mealType,
+      name: data.name,
+      weight: data.weight,
+      kcal: data.kcal,
+      macros: {
+        proteins: ((data.proteins || 0) * data.weight) / 100,
+        carbs: ((data.carbs || 0) * data.weight) / 100,
+        fats: ((data.fats || 0) * data.weight) / 100,
+        fiber: ((data.fiber || 0) * data.weight) / 100,
+      },
+      date: format(data.date, "yyyy-MM-dd"),
+    };
 
-    const {data: result, isPending, mutate: mutateEditMeal} = useMutation({
-        mutationFn: updateMeal,
-        onSuccess: async(_data, variables) => {
-            const mealDate = format(variables.data.date, 'yyyy-MM-dd');
+    const result = await api.put(`/meals/update/${mealId}`, meal);
+    return result.data;
+  };
 
-             await queryClient.invalidateQueries({
-                queryKey: ['meals', mealDate],
-            });
+  const {
+    data: result,
+    isPending,
+    mutate: mutateEditMeal,
+  } = useMutation({
+    mutationFn: updateMeal,
+    onSuccess: async (_data, variables) => {
+      const mealDate = format(variables.data.date, "yyyy-MM-dd");
 
-            toast.success('Success!', {
-                description: 'Meal was edited successfully!'
-            });
+      await queryClient.invalidateQueries({
+        queryKey: ["meals", mealDate],
+      });
 
-            navigate(`/meals?date=${mealDate}`);
-        },
-        onError: queryErrorHandler
-    })
+      toast.success("Success!", {
+        description: "Meal was edited successfully!",
+      });
 
-    return { result, isPending, mutateEditMeal}
-}
+      navigate(`/meals?date=${mealDate}`);
+    },
+    onError: queryErrorHandler,
+  });
 
-export default useEditMeal
+  return { result, isPending, mutateEditMeal };
+};
+
+export default useEditMeal;
