@@ -5,7 +5,7 @@
   "license": "ISC",
   "author": "Daniiel Hlopina",
   "type": "module",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "start": "node backend/server.js",
     "build": "npm --prefix frontend ci && npm --prefix frontend run build",
