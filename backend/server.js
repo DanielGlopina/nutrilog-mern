@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import connectDB from './config/db.js';
-import app from './app.js';
+import app from '../index.js';
 const port = process.env.PORT || 8000;
 
 if (!process.env.JWTSECRET) {
