@@ -30,7 +30,8 @@ const queryClient = new QueryClient({
   },
 });
 
-const router = createBrowserRouter([
+// Keep route definitions in one place so layouts can share navigation and auth guards.
+export const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
@@ -56,6 +57,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+  // Restore and verify the persisted session before protected screens are used.
   useVerifyToken();
 
   return (

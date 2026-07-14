@@ -12,6 +12,7 @@ const useCreateMeal = () => {
   const queryClient = useQueryClient();
 
   const createMeal = async (data: z.infer<typeof mealFormSchema>) => {
+    // Convert per-100g form values into totals stored for this meal entry.
     const meal = {
       mealType: data.mealType,
       name: data.name,
@@ -26,6 +27,7 @@ const useCreateMeal = () => {
       date: format(data.date, "yyyy-MM-dd"),
     };
     const result = await api.post("/meals/create", meal);
+
     return result.data;
   };
 
@@ -36,6 +38,7 @@ const useCreateMeal = () => {
   } = useMutation({
     mutationFn: createMeal,
     onSuccess: async (_data, variables) => {
+      // Refresh only the date affected by the mutation.
       const mealDate = format(variables.date, "yyyy-MM-dd");
 
       await queryClient.invalidateQueries({

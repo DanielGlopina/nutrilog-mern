@@ -4,6 +4,7 @@ import { nutritionsFormSchema } from "@/validation/nutritionsForm.schema";
 export function calculateUserNutririons(
   data: z.infer<typeof nutritionsFormSchema>,
 ) {
+  // Mifflin-St Jeor equation provides the baseline daily energy expenditure.
   const BMR_base = 10 * data.weight + 6.25 * data.height - 5 * data.age;
   let resultKcal = data.gender === "male" ? BMR_base + 5 : BMR_base - 161;
 
@@ -49,6 +50,7 @@ export function calculateUserNutririons(
   let carbs = Math.round((resultKcal - (proteins * 4 + fats * 9)) / 4);
 
   if (carbs <= 0) {
+    // Fall back to a balanced split when fixed targets leave no calories for carbs.
     proteins = Math.round((resultKcal * 0.4) / 4);
     fats = Math.round((resultKcal * 0.3) / 9);
     carbs = Math.round((resultKcal * 0.3) / 4);

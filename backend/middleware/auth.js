@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export default function (req, res, next) {
-    // Get token from the header
+    // Protected routes receive the JWT through the shared API client.
     const token = req.header('x-auth-token');
 
     // Check if no token
@@ -12,7 +12,7 @@ export default function (req, res, next) {
        return next(new Error('No token, authorization denied'))
     }
 
-    // Verify token
+    // Expose only the verified user payload to downstream controllers.
     try {
         const decoded = jwt.verify(token, process.env.JWTSECRET);
 

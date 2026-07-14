@@ -7,19 +7,14 @@ const HomePage = () => {
   const { isAuthenticated } = useAuthStore();
 
   return (
-    // 1. Убрали bg-white, overflow-hidden и relative. Они здесь больше не нужны.
     <div className="flex-1 flex items-center justify-center">
-      {/* 2. МАГИЯ ЗДЕСЬ: Меняем absolute на fixed и добавляем -z-10. 
-          Теперь картинка приклеена к экрану и всегда будет на весь размер окна, 
-          игнорируя любые отступы (padding) родительских компонентов! 
-      */}
       <img
         alt="Cover Image"
         src="/cover.webp"
         className="fixed inset-0 w-full h-full object-cover opacity-50 -z-10"
       />
 
-      {/* 3. Оставляем relative, чтобы контент был поверх картинки */}
+      {/* Keep the call-to-action content above the fixed background image. */}
       <div className="relative text-center flex flex-col gap-4">
         <h1 className="text-5xl font-bold flex gap-1 items-center justify-center">
           <Leaf className="text-lime-500" size={60} /> NutriLog

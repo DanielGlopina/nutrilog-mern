@@ -1,6 +1,7 @@
 import type { MealItem } from "@/types/MealItem.type";
 
 export function calculateNutrientsTotals(meals: MealItem[]) {
+  // Scale nutrient values by meal weight before combining the daily totals.
   const rawNutrients = meals.reduce(
     (acc, meal) => {
       acc.kcal += Number(meal.kcal) * (meal.weight / 100) || 0;

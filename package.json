@@ -8,6 +8,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node backend/server.js",
+    "build": "npm --prefix frontend ci && npm --prefix frontend run build",
+    "test": "npm --prefix frontend run test:run",
+    "lint": "npm --prefix frontend run lint",
     "server": "nodemon backend/server.js",
     "client": "npm --prefix frontend run dev",
     "dev": "concurrently \"npm run server\" \"npm run client\""
@@ -16,6 +19,7 @@
     "bcryptjs": "^3.0.3",
     "colors": "^1.4.0",
     "date-fns": "^4.4.0",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-validator": "^7.3.2",
     "gravatar": "^1.8.2",
@@ -24,7 +28,6 @@
   },
   "devDependencies": {
     "concurrently": "^10.0.3",
-    "dotenv": "^17.4.2",
     "nodemon": "^3.1.14"
   }
 }

@@ -1,4 +1,5 @@
 const errorHandler = (err, req, res, next) => {
+  // Normalize validator, Mongoose, and application errors into one API shape.
   let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   let formattedErrors = [];
 

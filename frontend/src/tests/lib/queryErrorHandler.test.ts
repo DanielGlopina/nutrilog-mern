@@ -41,4 +41,14 @@ describe("queryErrorHandler", () => {
       description: "Custom axios error message",
     });
   });
+
+  it("should support the backend string error format", () => {
+    vi.spyOn(axios, "isAxiosError").mockReturnValue(true);
+
+    queryErrorHandler({ response: { data: { errors: ["Token is not valid"] } } });
+
+    expect(toast.error).toHaveBeenCalledWith("Error!", {
+      description: "Token is not valid",
+    });
+  });
 });

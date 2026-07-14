@@ -7,7 +7,12 @@ import { CalendarIcon } from "lucide-react"
 import { addDays, format, subYears } from "date-fns"
 import { Calendar } from "./calendar"
 
-const CalendarPopover = ({ field }: { field: any }) => {
+type CalendarField = {
+  value?: Date
+  onChange: (date: Date | undefined) => void
+}
+
+const CalendarPopover = ({ field }: { field: CalendarField }) => {
   return <Popover>
     <PopoverTrigger asChild>
       <Button

@@ -37,6 +37,7 @@ export const useAuthStore = create<AuthStore>()(
     {
       name: "auth-storage",
 
+      // Persist session data only; transient loading state is recalculated on startup.
       partialize: (state) => ({
         token: state.token,
         isAuthenticated: state.isAuthenticated,

@@ -7,10 +7,10 @@ const api = axios.create({
 })
 
 
-// If 401st error is received either on /auth/login or  /auth/register, then credentials are invalid
-const AUTH_ENDPOINTS = ['/auth/login', '/auth/register'];
+// Public auth failures must not be treated as an expired authenticated session.
+const AUTH_ENDPOINTS = ['/auth', '/users'];
 
-// Request interceptor 
+// Attach the persisted JWT to every protected API request.
 api.interceptors.request.use((config) => {
     try {
         const isAuthEndpoint = AUTH_ENDPOINTS.some((endpoint) => config.url?.includes(endpoint));
@@ -37,7 +37,7 @@ api.interceptors.request.use((config) => {
     }
 )
 
-// Response interceptor — handling 401st error & logging out
+// A 401 from a protected endpoint invalidates the local session.
 api.interceptors.response.use(
     (response) => response,
     (error) => {

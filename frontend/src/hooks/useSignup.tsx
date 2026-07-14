@@ -36,7 +36,8 @@ const useSignup = () => {
 
 
             if(axios.isAxiosError(error)){
-               errorMsg = error.response?.data.errors[0].msg
+               const apiError = error.response?.data?.errors?.[0]
+               errorMsg = (typeof apiError === 'string' ? apiError : apiError?.msg) ?? errorMsg
             }
 
             toast.error('Error!', {

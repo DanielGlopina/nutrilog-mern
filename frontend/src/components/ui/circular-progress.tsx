@@ -8,6 +8,7 @@ import Box from "@mui/material/Box";
 export function CircularProgressWithLabel(
   props: CircularProgressProps & { value: number },
 ) {
+  // Negative consumption is not meaningful, but overflow remains visible in the label.
   const value = props.value < 0 ? 0 : props.value;
 
   return (
@@ -18,7 +19,7 @@ export function CircularProgressWithLabel(
         justifyContent: "center",
       }}
     >
-      {/* Фоновое кольцо (улучшает UX, показывая контур при 0%) */}
+      {/* The background ring keeps the target visible when progress is at 0%. */}
       <CircularProgress
         variant="determinate"
         value={100}
@@ -26,11 +27,11 @@ export function CircularProgressWithLabel(
         thickness={4}
         sx={{
           position: "absolute",
-          color: (theme) => theme.palette.grey[200], // Серый цвет фона
+          color: (theme) => theme.palette.grey[200],
         }}
       />
 
-      {/* Основной индикатор прогресса */}
+      {/* Cap the arc at a full circle; color and label still communicate overflow. */}
       <CircularProgress
         variant="determinate"
         aria-label="Percent of macronutrient consumed"
@@ -41,8 +42,6 @@ export function CircularProgressWithLabel(
         value={Math.min(value, 100)}
         sx={{
           "& .MuiCircularProgress-circle": {
-            // КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: отключаем CSS-анимацию,
-            // так как анимацией управляет JS (requestAnimationFrame)
             transition: "none",
           },
           ...props.sx,
@@ -84,6 +83,7 @@ export default function CircularWithValueLabel({
   const [progress, setProgress] = React.useState(0);
 
   React.useEffect(() => {
+    // Animate changes with an ease-out curve and cancel stale frames on unmount.
     const target = Math.max(0, currentValue);
     const duration = 2200;
 

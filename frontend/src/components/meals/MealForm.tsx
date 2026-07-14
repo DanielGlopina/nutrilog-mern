@@ -32,10 +32,10 @@ type Props = {
   defaultMealType?: string;
   formType: "create" | "edit";
   mealData?: MealItem | null;
-  isQuerrying: boolean;
+  isQuerrying?: boolean;
 };
 
-function MealForm({ defaultMealType, formType, mealData, isQuerrying }: Props) {
+function MealForm({ defaultMealType, formType, mealData, isQuerrying = false }: Props) {
   const queryClient = useQueryClient();
   const [isPending, startTransition] = useTransition();
   const { isChecking } = useAuthStore();

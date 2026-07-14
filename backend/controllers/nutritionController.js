@@ -42,6 +42,7 @@ const updateNutritions = async(req, res, next) => {
             }
         }
 
+        // Nutrition targets are created on first submission and updated afterwards.
         const userNutition = await Nutrition.findOne({user: req.user.id});
         
         if(!userNutition){

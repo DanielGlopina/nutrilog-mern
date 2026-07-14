@@ -9,6 +9,7 @@ const useVerifyToken = () => {
   useTokenExpiration();
 
   useEffect(() => {
+    // Validate the persisted token and hydrate the user profile after a page refresh.
     const checkAuth = async () => {
       if (!token) {
         setIsChecking(false);
