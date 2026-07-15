@@ -6,26 +6,14 @@ import { format } from "date-fns";
 import { api } from "@/api/api";
 import { mealFormSchema } from "@/validation/mealForm.schema";
 import { queryErrorHandler } from "@/lib/queryErrorHandler";
+import { createMealPayload } from "@/lib/mealPayload";
 
 const useCreateMeal = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const createMeal = async (data: z.infer<typeof mealFormSchema>) => {
-    // Convert per-100g form values into totals stored for this meal entry.
-    const meal = {
-      mealType: data.mealType,
-      name: data.name,
-      weight: data.weight,
-      kcal: ((data.kcal || 0) * data.weight) / 100,
-      macros: {
-        proteins: ((data.proteins || 0) * data.weight) / 100,
-        carbs: ((data.carbs || 0) * data.weight) / 100,
-        fats: ((data.fats || 0) * data.weight) / 100,
-        fiber: ((data.fiber || 0) * data.weight) / 100,
-      },
-      date: format(data.date, "yyyy-MM-dd"),
-    };
+    const meal = createMealPayload(data);
     const result = await api.post("/meals/create", meal);
 
     return result.data;

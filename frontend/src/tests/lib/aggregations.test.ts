@@ -94,4 +94,23 @@ describe("calculateNutrientsTotal", () => {
       macros: { proteins: 22, carbs: 22, fats: 22, fiber: 22 },
     }); // 10 * (221/100) = 22.1 --> 22 after rounding
   });
+
+  it("should scale per-100g values exactly once for a 400g meal", () => {
+    expect(
+      calculateNutrientsTotals([
+        {
+          _id: "meal-id",
+          mealType: "breakfast",
+          name: "Example Food",
+          weight: 400,
+          kcal: 100,
+          macros: { proteins: 10, carbs: 10, fats: 10, fiber: 8 },
+          date: new Date("2026-07-15"),
+        },
+      ]),
+    ).toEqual({
+      kcal: 400,
+      macros: { proteins: 40, carbs: 40, fats: 40, fiber: 32 },
+    });
+  });
 });
